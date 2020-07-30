@@ -1,9 +1,5 @@
 #!/usr/bin/python3
 
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
-
 import sqlog
 import sqlog.qso
 
@@ -28,10 +24,3 @@ def read_adi(filename):
 		adi = hamutils.adif.ADIReader(f)
 		for qso in adi:
 			yield sqlog.qso.QSO.from_adi(qso)
-
-
-sqlog.Config.load('config.cfg')
-
-
-qsos = read_adi(sys.argv[1])
-import_qsos(qsos)

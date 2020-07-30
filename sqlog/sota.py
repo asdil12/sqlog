@@ -6,6 +6,8 @@ import csv
 import requests
 import pymysql.cursors
 
+import sqlog
+
 def update_db():
 	SUMMIT_DB_FILE = 'summitslist.csv'
 	# download CSV
