@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 import configparser
 import pymysql.cursors
 
@@ -7,6 +8,7 @@ class Config(object):
 	_object = None
 
 	def __init__(self, configfile):
+		assert os.path.exists(configfile), "Configfile '%s' not found" % configfile
 		self.config = configparser.ConfigParser()
 		self.config.read(configfile)
 
