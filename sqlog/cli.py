@@ -4,10 +4,32 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
 
+import argparse
+
 import sqlog
 import sqlog.load
 
-sqlog.Config.load('config.cfg')
 
-qsos = sqlog.load.read_adi(sys.argv[1])
-sqlog.load.import_qsos(qsos)
+parser = argparse.ArgumentParser(description='SQLog Amateur Radio Logbook CLI.')
+subparsers = parser.add_subparsers(dest='command', help='command')
+subparsers.required = True
+
+parser.add_argument('-c', dest='config', default='config.cfg', help='Config file')
+
+h = 'Import QSOs from file'
+parser_import = subparsers.add_parser('import', description=h, help=h)
+parser_import.add_argument('file', help='ADIF file')
+
+h = 'Refresh SOTA summits database'
+parser_sota = subparsers.add_parser('sotarefresh', description=h, help=h)
+
+args = parser.parse_args()
+
+
+sqlog.Config.load(args.config)
+
+if args.command == 'import':
+	qsos = sqlog.load.read_adi(args.file)
+	sqlog.load.import_qsos(qsos)
+elif args.command == 'sotarefresh':
+	sqlog.sota.update_db()

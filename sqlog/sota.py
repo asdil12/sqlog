@@ -3,15 +3,18 @@
 import os
 import sys
 import csv
+import datetime
+from dateutil.parser import parse as parsedate
+
 import requests
 import pymysql.cursors
 
 import sqlog
 
 def update_db():
-	SUMMIT_DB_FILE = 'summitslist.csv'
+	SUMMIT_DB_FILE = './summitslist.csv'
 	# download CSV
-	url = Config.get('sota', 'summit_db_url')
+	url = sqlog.Config.get('sota', 'summit_db_url')
 	os.makedirs(os.path.dirname(SUMMIT_DB_FILE), exist_ok=True)
 	r = requests.head(url)
 	try:
@@ -22,6 +25,7 @@ def update_db():
 		sys.stdout.flush()
 		r = requests.get(url, allow_redirects=True, stream=True)
 		with open(SUMMIT_DB_FILE, 'wb') as f:
+			print('Downloading summits ', end='')
 			for chunk in r.iter_content(1024 * 1024):
 				sys.stdout.write('.')
 				sys.stdout.flush()
@@ -32,19 +36,23 @@ def update_db():
 	connection = sqlog.mysql_connection()
 	try:
 		with connection.cursor() as cursor:
-			f = open(SUMMIT_DB_FILE, 'r')
-			f.readline()  # skip first line that looks like "SOTA Summits List (Date=29/06/2020)"
-			print('Loading summits ', end='')
-			sys.stdout.flush()
-			i = 0
-			for summit in csv.DictReader(f):
-				i += 1
-				if i % 10000 == 0:
-					sys.stdout.write('.')
-					sys.stdout.flush()
-				cursor.execute("""INSERT INTO summits (ref, name, region, association, altitude, lat, lon)
-				                VALUES (%(SummitCode)s, %(SummitName)s, %(RegionName)s, %(AssociationName)s, %(AltM)s, %(Latitude)s, %(Longitude)s)""", summit)
-				connection.commit()
+			def _summits():
+				f = open(SUMMIT_DB_FILE, 'r')
+				f.readline()  # skip first line that looks like "SOTA Summits List (Date=29/06/2020)"
+				print('Importing summits ', end='')
+				sys.stdout.flush()
+				i = 0
+				for summit in csv.DictReader(f):
+					i += 1
+					if i % 1000 == 0:
+						sys.stdout.write('.')
+						sys.stdout.flush()
+					yield summit
+			cursor.execute("DELETE FROM summits")
+			connection.commit()
+			cursor.executemany("""INSERT INTO summits (ref, name, region, association, altitude, lat, lon)
+			                      VALUES (%(SummitCode)s, %(SummitName)s, %(RegionName)s, %(AssociationName)s, %(AltM)s, %(Latitude)s, %(Longitude)s)""", _summits())
+			connection.commit()
 			sys.stdout.write("\n")
 	finally:
 		connection.close()
