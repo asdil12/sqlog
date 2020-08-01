@@ -18,7 +18,7 @@ parser.add_argument('-c', dest='config', default='config.cfg', help='Config file
 
 h = 'Import QSOs from file'
 parser_import = subparsers.add_parser('import', description=h, help=h)
-parser_import.add_argument('file', help='ADIF file')
+parser_import.add_argument('file', help='ADIF/CSV file')
 
 h = 'Refresh SOTA summits database'
 parser_sota = subparsers.add_parser('sotarefresh', description=h, help=h)
@@ -29,7 +29,10 @@ args = parser.parse_args()
 sqlog.Config.load(args.config)
 
 if args.command == 'import':
-	qsos = sqlog.load.read_adi(args.file)
+	if args.file.endswith('csv'):
+		qsos = sqlog.load.read_csv(args.file)
+	else:
+		qsos = sqlog.load.read_adi(args.file)
 	sqlog.load.import_qsos(qsos)
 elif args.command == 'sotarefresh':
 	sqlog.sota.update_db()

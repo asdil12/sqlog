@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+import datetime
+
+from hamutils.adif.common import convert_freq_to_band
+
 import sqlog.geo
 import sqlog.sota
 
@@ -55,42 +59,71 @@ class QSO(object):
 			if not isinstance(self.data['distance'], float):
 				self.data['distance'] = sqlog.geo.distance(self.data['my_lat'], self.data['my_lon'], self.data['lat'], self.data['lon'])
 
+		# Get band from freq if not set
+		if self.data['freq'] and not self.data['band']:
+			self.data['band'] = convert_freq_to_band(self.data['freq'])
+
 	@classmethod
 	def from_adi(cls, adi):
-		a = adi
 		d = {}
 		#TODO: handle _intl fields
-		d['datetime'] = a['datetime_on']
-		if 'operator' in a:
-			d['my_callsign'] = a['operator']
-		d['callsign'] = a['call']
-		if 'name' in a:
-			d['name'] = a['name']
-		d['freq'] = float(a['freq'])
-		d['band'] = a['band']
-		d['mode'] = a['mode']
-		if 'rst_rcvd' in a:
-			d['rst_rcvd'] = a['rst_rcvd']
-		if 'rst_sent' in a:
-			d['rst_sent'] = a['rst_sent']
+		d['datetime'] = adi['datetime_on']
+		if 'operator' in adi:
+			d['my_callsign'] = adi['operator']
+		d['callsign'] = adi['call']
+		if 'name' in adi:
+			d['name'] = adi['name']
+		d['freq'] = float(adi['freq'])
+		d['band'] = adi['band']
+		d['mode'] = adi['mode']
+		if 'rst_rcvd' in adi:
+			d['rst_rcvd'] = adi['rst_rcvd']
+		if 'rst_sent' in adi:
+			d['rst_sent'] = adi['rst_sent']
 		# ignore qsl from ADI
 		# prepare_fields() will take care of my_qth if my_sota_ref is set
-		if 'my_sota_ref' in a:
-			d['my_sota_ref'] = a['my_sota_ref']
-		if 'my_gridsquare' in a:
-			d['my_gridsquare'] = a['my_gridsquare']
-		if 'my_lat' in a and 'my_lon' in a:
-			d['my_lat'] = float(a['my_lat'])
-			d['my_lon'] = float(a['my_lat'])
-		if 'qth' in a:
-			d['qth'] = a['qth']
-		if 'sota_ref' in a:
-			d['sota_ref'] = a['sota_ref']
-		if 'gridsquare' in a:
-			d['gridsquare'] = a['gridsquare']
-		if 'lat' in a and 'lon' in a:
-			d['lat'] = float(a['lat'])
-			d['lon'] = float(a['lat'])
-		if 'comment' in a:
-			d['remarks'] = a['comment']
+		if 'my_sota_ref' in adi:
+			d['my_sota_ref'] = adi['my_sota_ref']
+		if 'my_gridsquare' in adi:
+			d['my_gridsquare'] = adi['my_gridsquare']
+		if 'my_lat' in adi and 'my_lon' in adi:
+			d['my_lat'] = float(adi['my_lat'])
+			d['my_lon'] = float(adi['my_lat'])
+		if 'qth' in adi:
+			d['qth'] = adi['qth']
+		if 'sota_ref' in adi:
+			d['sota_ref'] = adi['sota_ref']
+		if 'gridsquare' in adi:
+			d['gridsquare'] = adi['gridsquare']
+		if 'lat' in adi and 'lon' in adi:
+			d['lat'] = float(adi['lat'])
+			d['lon'] = float(adi['lat'])
+		if 'comment' in adi:
+			d['remarks'] = adi['comment']
+		return cls(**d)
+
+	@classmethod
+	def from_csv(cls, csv):
+		d = {}
+		assert csv['version'] == 'V2', 'Unexpected CSV version: "%s"' % csv['version']
+		d['my_callsign'] = csv['my_callsign']
+		d['my_sota_ref'] = csv['my_sota_ref']
+		try:
+			date = datetime.datetime.strptime(csv['date'], '%d/%m/%y').date()
+		except ValueError:
+			date = datetime.datetime.strptime(csv['date'], '%d/%m/%Y').date()
+		time = datetime.datetime.strptime(csv['time'], '%H:%M').time()
+		d['datetime'] = datetime.datetime.combine(date, time)
+		freq = csv['freq'].upper().replace('MHZ', '')
+		if 'KHZ' in freq:
+			freq = float(freq.replace('KHZ', '')) / 1000
+		elif 'GHZ' in freq:
+			freq = float(freq.replace('GHZ', '')) * 1000
+		else:
+			freq = float(freq)
+		d['freq'] = freq
+		d['mode'] = csv['mode']
+		d['callsign'] = csv['callsign']
+		d['sota_ref'] = csv['sota_ref']
+		d['remarks'] = csv['remarks']
 		return cls(**d)
