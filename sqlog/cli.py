@@ -22,6 +22,7 @@ parser_import.add_argument('file', help='ADIF/CSV file')
 
 h = 'Refresh SOTA summits database'
 parser_sota = subparsers.add_parser('sotarefresh', description=h, help=h)
+parser_sota.add_argument('-D', '--no-download', action='store_true', help='Only import the already downloaded summits CSV into the DB')
 
 args = parser.parse_args()
 
@@ -35,4 +36,4 @@ if args.command == 'import':
 		qsos = sqlog.load.read_adi(args.file)
 	sqlog.load.import_qsos(qsos)
 elif args.command == 'sotarefresh':
-	sqlog.sota.update_db()
+	sqlog.sota.update_db(not args.no_download)
