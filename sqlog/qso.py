@@ -16,6 +16,9 @@ class QSO(object):
 		self.data = data
 		self.prepare_fields()
 
+	def __repr__(self):
+		return 'QSO(%s)' % ', '.join(['%s=%s' % (ks, self.data[k]) for k, ks in (('datetime', 'dt'), ('callsign', 'call'), ('my_sota_ref', 'sota')) if self.data[k]])
+
 	def prepare_fields(self):
 		d = self.data
 		self.data = {}

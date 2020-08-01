@@ -14,6 +14,7 @@ def import_qsos(qsos):
 			field_keys = ', '.join(map(lambda f: '`%s`' % f, sqlog.qso.fields))
 			field_values = ', '.join(map(lambda f: '%%(%s)s' % f, sqlog.qso.fields))
 			for qso in qsos:
+				print(repr(qso))
 				cursor.execute('INSERT INTO qsos (%s) VALUES (%s)' % (field_keys, field_values), qso.data)
 				connection.commit()
 	except:
