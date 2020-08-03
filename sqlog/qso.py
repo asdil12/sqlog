@@ -12,9 +12,106 @@ import sqlog.sota
 fields = ('datetime', 'my_callsign', 'callsign', 'name', 'freq', 'band', 'mode', 'rst_rcvd', 'rst_sent', 'qsl', 'my_qth', 'my_sota_ref', 'my_gridsquare', 'my_lat', 'my_lon', 'qth', 'sota_ref', 'gridsquare', 'lat', 'lon', 'distance', 'remarks')
 
 class QSO(object):
-	def __init__(self, **data):
+	def __init__(self, data={}, **kwdata):
 		self.data = data
+		self.data.update(kwdata)
 		self.prepare_fields()
+
+	@property
+	def datetime(self):
+		return self.data['datetime']
+
+	@property
+	def date(self):
+		return self.data['datetime'].date()
+
+	@property
+	def time(self):
+		return self.data['datetime'].time()
+
+	@property
+	def my_callsign(self):
+		return self.data['my_callsign']
+
+	@property
+	def callsign(self):
+		return self.data['callsign']
+
+	@property
+	def name(self):
+		return self.data['name']
+
+	@property
+	def freq(self):
+		return self.data['freq']
+
+	@property
+	def band(self):
+		return self.data['band']
+
+	@property
+	def mode(self):
+		return self.data['mode']
+
+	@property
+	def rst_rcvd(self):
+		return self.data['rst_rcvd']
+
+	@property
+	def rst_sent(self):
+		return self.data['rst_sent']
+
+	@property
+	def qsl(self):
+		return self.data['qsl']
+
+	@property
+	def my_qth(self):
+		return self.data['my_qth']
+
+	@property
+	def my_sota_ref(self):
+		return self.data['my_sota_ref']
+
+	@property
+	def my_gridsquare(self):
+		return self.data['my_gridsquare']
+
+	@property
+	def my_lat(self):
+		return self.data['my_lat']
+
+	@property
+	def my_lon(self):
+		return self.data['my_lon']
+
+	@property
+	def qth(self):
+		return self.data['qth']
+
+	@property
+	def sota_ref(self):
+		return self.data['sota_ref']
+
+	@property
+	def gridsquare(self):
+		return self.data['gridsquare']
+
+	@property
+	def lat(self):
+		return self.data['lat']
+
+	@property
+	def lon(self):
+		return self.data['lon']
+
+	@property
+	def distance(self):
+		return self.data['distance']
+
+	@property
+	def remarks(self):
+		return self.data['remarks']
 
 	def __repr__(self):
 		return 'QSO(%s)' % ', '.join(['%s=%s' % (ks, self.data[k]) for k, ks in (('datetime', 'dt'), ('callsign', 'call'), ('my_sota_ref', 'sota')) if self.data[k]])
@@ -103,7 +200,7 @@ class QSO(object):
 			d['lon'] = float(adi['lat'])
 		if 'comment' in adi:
 			d['remarks'] = adi['comment']
-		return cls(**d)
+		return cls(d)
 
 	@classmethod
 	def from_csv(cls, csv):
@@ -129,4 +226,4 @@ class QSO(object):
 		d['callsign'] = csv['callsign']
 		d['sota_ref'] = csv['sota_ref']
 		d['remarks'] = csv['remarks']
-		return cls(**d)
+		return cls(d)
