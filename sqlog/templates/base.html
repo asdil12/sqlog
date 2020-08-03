@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-4.5.0-dist/css/bootstrap.min.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+		<title>{% block title %}{% endblock %}</title>
+	</head>
+	<body>
+		{% block nav %}
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<a class="navbar-brand" href="#">SQLog</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active"><a class="nav-link" href="#">Logbook</a></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
+					<div class="dropdown-menu">
+						<a class="dropdown-item" href="#">New QSO</a>
+						<a class="dropdown-item" href="#">Write QSL Cards</a>
+						<a class="dropdown-item" href="#">Import QSOs</a>
+						<a class="dropdown-item" href="#">Export QSOs</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">SOTA</a>
+					<div class="dropdown-menu">
+					<a class="dropdown-item" href="#">My Summits</a>
+					<a class="dropdown-item" href="#">Refresh SOTA Summits</a>
+					</div>
+				</li>
+			</ul>
+			<!--<input class="top-searchbar w-100" type="text" placeholder="Search">-->
+			<!--<form class="form-inline flex-fill">-->
+			<form class="form-inline">
+				<input type="text" class="form-control top-searchbar" placeholder="Search Callsign">
+			</form>
+			</div>
+		</nav>
+		{% endblock %}
+		{% block body %}
+		{% endblock %}
+
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="{{ url_for('static', filename='js/jquery-3.5.1.slim.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+		<script src="{{ url_for('static', filename='bootstrap-4.5.0-dist/js/bootstrap.min.js') }}"></script>
+	</body>
+</html>

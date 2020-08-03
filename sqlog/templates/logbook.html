@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<table class="table table-striped fixedheader">
+	<thead>
+		<tr>
+			<th scope="col">Date</th>
+			<th scope="col">UTC</th>
+			<th scope="col">Callsign</th>
+			<th scope="col">Band</th>
+			<th scope="col">Mode</th>
+			<th scope="col">My&nbsp;Summit</th>
+			<th scope="col">Summit</th>
+			<th scope="col" class="d-none d-lg-table-cell">Distance</th>
+			<th scope="col" class="d-none d-lg-table-cell">Remarks</th>
+			<th scope="col" class="d-none d-lg-table-cell">My&nbsp;Callsign</th>
+			<th scope="col">Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for qso in qsos %}
+	<tr>
+		<td>{{ qso.date.strftime("%d.%m.%y") }}</td>
+		<td>{{ qso.time.strftime("%H:%M") }}</td>
+		<td>{{ qso.callsign }}</td>
+		<td>{{ qso.band }}</td>
+		<td>{{ qso.mode }}</td>
+		<td>{{ qso.my_sota_ref }}</td>
+		<td>{{ qso.sota_ref }}</td>
+		<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance }}</td>
+		<td class="d-none d-lg-table-cell">{{ qso.remarks }}</td>
+		<td class="d-none d-lg-table-cell">{{ qso.my_callsign }}</td>
+		<td>TODO</td>
+	</tr>
+	{%- endfor %}
+	</tbody>
+</table>
+{% endblock %}
