@@ -163,6 +163,17 @@ class QSO(object):
 		if self.data['freq'] and not self.data['band']:
 			self.data['band'] = convert_freq_to_band(self.data['freq'])
 
+		# Ensure that some fields are uppercase
+		def _ensure_uppercase_field(field):
+			if self.data[field]:
+				self.data[field] = self.data[field].upper()
+		_ensure_uppercase_field('my_callsign')
+		_ensure_uppercase_field('callsign')
+		_ensure_uppercase_field('my_sota_ref')
+		_ensure_uppercase_field('sota_ref')
+		_ensure_uppercase_field('my_gridsquare')
+		_ensure_uppercase_field('gridsquare')
+
 	@classmethod
 	def from_adi(cls, adi):
 		d = {}
