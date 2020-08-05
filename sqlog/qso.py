@@ -143,7 +143,7 @@ class QSO(object):
 				self.data['qth'] = str(summit)
 
 		# Set locator based on coordinates
-		if not self.data['my_gridsquare'] and (self.data['lat'] and self.data['lon']):
+		if not self.data['my_gridsquare'] and (self.data['my_lat'] and self.data['my_lon']):
 			self.data['my_gridsquare'] = sqlog.geo.gridsquare(self.data['my_lat'], self.data['my_lon'])
 		if not self.data['gridsquare'] and (self.data['lat'] and self.data['lon']):
 			self.data['gridsquare'] = sqlog.geo.gridsquare(self.data['lat'], self.data['lon'])
