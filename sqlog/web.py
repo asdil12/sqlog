@@ -43,6 +43,18 @@ def logbook():
 	finally:
 		connection.close()
 
+@app.route('/sota/summits')
+def summits():
+	connection = sqlog.mysql_connection()
+	try:
+		with connection.cursor() as cursor:
+			cursor.execute("""SELECT my_sota_ref, COUNT(id) AS qsos, MAX(datetime) as last_activation, summits.name, region, association, altitude
+			                  FROM qsos LEFT JOIN summits ON qsos.my_sota_ref = summits.ref
+			                  GROUP BY my_sota_ref ORDER BY last_activation""")
+			return render_template('summits.html', summits=cursor.fetchall())
+	finally:
+		connection.close()
+
 
 if __name__ == '__main__':
 	app.run(debug=True)
