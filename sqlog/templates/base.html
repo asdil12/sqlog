@@ -16,30 +16,28 @@
 			<a class="navbar-brand" href="#">SQLog</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"><span class="navbar-toggler-icon"></span></button>
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
-			<ul class="navbar-nav mr-auto">
-				<li class="nav-item active"><a class="nav-link" href="#">Logbook</a></li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
-					<div class="dropdown-menu">
-						<a class="dropdown-item" href="#">New QSO</a>
-						<a class="dropdown-item" href="#">Write QSL Cards</a>
-						<a class="dropdown-item" href="#">Import QSOs</a>
-						<a class="dropdown-item" href="#">Export QSOs</a>
-					</div>
-				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">SOTA</a>
-					<div class="dropdown-menu">
-					<a class="dropdown-item" href="#">My Summits</a>
-					<a class="dropdown-item" href="#">Refresh SOTA Summits</a>
-					</div>
-				</li>
-			</ul>
-			<!--<input class="top-searchbar w-100" type="text" placeholder="Search">-->
-			<!--<form class="form-inline flex-fill">-->
-			<form class="form-inline">
-				<input type="text" class="form-control top-searchbar" placeholder="Search Callsign">
-			</form>
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active"><a class="nav-link" href="#">Logbook</a></li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
+						<div class="dropdown-menu">
+							<a class="dropdown-item" href="#">New QSO</a>
+							<a class="dropdown-item" href="#">Write QSL Cards</a>
+							<a class="dropdown-item" href="#">Import QSOs</a>
+							<a class="dropdown-item" href="#">Export QSOs</a>
+						</div>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">SOTA</a>
+						<div class="dropdown-menu">
+						<a class="dropdown-item" href="#">My Summits</a>
+						<a class="dropdown-item" href="#">Refresh SOTA Summits</a>
+						</div>
+					</li>
+				</ul>
+				<form class="form-inline flex-fill" method="GET" action="{{ url_for('logbook') }}">
+					<input type="text" name="s" id="s" value="{{ s }}" class="form-control top-searchbar" placeholder="Search">
+				</form>
 			</div>
 		</nav>
 		{% endblock %}
