@@ -25,8 +25,8 @@
 		<td>{{ qso.callsign }}</td>
 		<td>{{ qso.band }}</td>
 		<td>{{ qso.mode }}</td>
-		<td>{{ qso.my_sota_ref }}</td>
-		<td>{{ qso.sota_ref }}</td>
+		<td>{{ summit_link(qso.my_sota_ref) }}</td>
+		<td>{{ summit_link(qso.sota_ref) }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.remarks }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.my_callsign }}</td>

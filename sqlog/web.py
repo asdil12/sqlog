@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
 
-from flask import Flask, render_template, request
+from flask import Flask, Markup, render_template, request
 import pymysql
 
 import sqlog
@@ -15,6 +15,17 @@ sqlog.Config.load(os.environ.get('CONFIG', 'config.cfg'))
 
 app = Flask(__name__)
 
+@app.context_processor
+def utility_processor():
+	def nav_active(endpoint):
+		if isinstance(endpoint, str):
+			active = (request.endpoint == endpoint)
+		else:
+			active = (request.endpoint in endpoint)
+		return 'active' if active else ''
+	def summit_link(ref):
+		return Markup('<a href="https://sotl.as/summits/%s">%s</a>' % (ref,ref)) if ref else ref
+	return {'nav_active': nav_active, 'summit_link': summit_link}
 
 @app.route('/')
 def logbook():
@@ -22,21 +33,14 @@ def logbook():
 	try:
 		with connection.cursor() as cursor:
 			s = request.args.get('s', '')
-			"""
-			if not s:
-				query = ''
-			elif ' ' in s or '=' in s:
-				query = 'WHERE %s' % s
-			elif '/' in query:
-				query = 'WHERE callsign = "%s"' % s #FIXME: escapt
-			else:
-			"""
 			if not s:
 				query = ''
 			elif not (' ' in s or '=' in s):
 				s = s.upper()
 				c = pymysql.escape_string(s)
 				query = 'WHERE callsign = "%s" OR callsign LIKE "%%/%s/%%" OR callsign LIKE "%%/%s" OR callsign LIKE "%s/%%"' % (c,c,c,c)
+			else:
+				query = 'WHERE %s' % s #FIXME: escape somehow?
 			cursor.execute('SELECT * FROM qsos %s ORDER BY datetime' % query)
 			qsos = map(sqlog.qso.QSO, cursor.fetchall())
 			return render_template('logbook.html', qsos=qsos, s=s)

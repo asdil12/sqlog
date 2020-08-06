@@ -17,7 +17,7 @@
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"><span class="navbar-toggler-icon"></span></button>
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
 				<ul class="navbar-nav mr-auto">
-					<li class="nav-item active"><a class="nav-link" href="#">Logbook</a></li>
+					<li class="nav-item {{ nav_active('logbook') }}"><a class="nav-link" href="{{ url_for('logbook') }}">Logbook</a></li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
 						<div class="dropdown-menu">
@@ -28,9 +28,9 @@
 						</div>
 					</li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">SOTA</a>
+						<a class="nav-link dropdown-toggle {{ nav_active(('summits')) }}" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">SOTA</a>
 						<div class="dropdown-menu">
-						<a class="dropdown-item" href="#">My Summits</a>
+						<a class="dropdown-item" href="{{ url_for('summits') }}">My Summits</a>
 						<a class="dropdown-item" href="#">Refresh SOTA Summits</a>
 						</div>
 					</li>
