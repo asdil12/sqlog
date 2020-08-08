@@ -179,7 +179,9 @@ class QSO(object):
 		d = {}
 		#TODO: handle _intl fields
 		d['datetime'] = adi['datetime_on']
-		if 'operator' in adi:
+		if 'station_callsign' in adi:
+			d['my_callsign'] = adi['station_callsign']
+		elif 'operator' in adi:
 			d['my_callsign'] = adi['operator']
 		d['callsign'] = adi['call']
 		if 'name' in adi:
