@@ -18,15 +18,15 @@
 		</tr>
 	</thead>
 	<tbody>
-	{% for qso in qsos %}
+	{% for qso, my_summit, summit in log_items %}
 	<tr>
 		<td>{{ qso.date.strftime("%d.%m.%y") }}</td>
 		<td>{{ qso.time.strftime("%H:%M") }}</td>
 		<td>{{ flag(qso.callsign) }}{{ qso.callsign }}</td>
 		<td>{{ qso.band }}</td>
 		<td><span class="badge badge-dark modebadge mode-{{ qso.mode|lower }}">{{ qso.mode }}</span></td>
-		<td>{{ flag(qso.my_sota_ref, True) if qso.my_sota_ref }}{{ summit_link(qso.my_sota_ref) }}</td>
-		<td>{{ flag(qso.sota_ref, True) if qso.sota_ref }}{{ summit_link(qso.sota_ref) }}</td>
+		<td>{{ flag(qso.my_sota_ref, True) if qso.my_sota_ref }}{{ summit_link(my_summit) }}</td>
+		<td>{{ flag(qso.sota_ref, True) if qso.sota_ref }}{{ summit_link(summit) }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.remarks if qso.remarks }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.my_callsign }}</td>

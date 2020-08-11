@@ -14,15 +14,15 @@
 		</tr>
 	</thead>
 	<tbody>
-	{% for summit in summits %}
+	{% for summit, qsos, last_activation in summit_items %}
 	<tr>
-		<td>{{ flag(summit.my_sota_ref, True) }}{{ summit_link(summit.my_sota_ref) }}</td>
+		<td>{{ flag(summit.ref, True) }}{{ summit_link(summit) }}</td>
 		<td>{{ summit.name }}</td>
 		<td>{{ summit.region }}</td>
 		<td>{{ summit.association }}</td>
 		<td>{{ summit.altitude }}m</td>
-		<td><a class="badge badge-pill badge-secondary qsocount" href="{{ url_for('logbook', s='my_sota_ref = "%s"' % summit.my_sota_ref) }}">{{ summit.qsos }}</a></td>
-		<td>{{ summit.last_activation.strftime("%d.%m.%y") }}</td>
+		<td><a class="badge badge-pill badge-secondary qsocount" href="{{ url_for('logbook', s='my_sota_ref = "%s"' % summit.ref) }}">{{ qsos }}</a></td>
+		<td>{{ last_activation.strftime("%d.%m.%y") }}</td>
 	</tr>
 	{%- endfor %}
 	</tbody>

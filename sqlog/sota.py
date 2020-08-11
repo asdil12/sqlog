@@ -59,21 +59,43 @@ def update_db(download=True):
 		connection.close()
 
 class Summit(object):
-	def __init__(self, ref):
-		connection = sqlog.mysql_connection()
-		try:
-			with connection.cursor() as cursor:
-				cursor.execute("SELECT * FROM summits WHERE ref = %s", (ref,))
-				result = cursor.fetchone()
-				self.ref = ref
-				self.name = result['name']
-				self.region = result['region']
-				self.association = result['association']
-				self.altitude = result['altitude']
-				self.lat = result['lat']
-				self.lon = result['lon']
-		finally:
-			connection.close()
+	def __init__(self, ref, fetch_from_db=True, name=None, region=None, association=None, altitude=None, lat=None, lon=None):
+		if fetch_from_db:
+			connection = sqlog.mysql_connection()
+			try:
+				with connection.cursor() as cursor:
+					cursor.execute("SELECT * FROM summits WHERE ref = %s", (ref,))
+					result = cursor.fetchone()
+					self.ref = ref
+					self.name = result['name']
+					self.region = result['region']
+					self.association = result['association']
+					self.altitude = result['altitude']
+					self.lat = result['lat']
+					self.lon = result['lon']
+			finally:
+				connection.close()
+		else:
+			self.ref = ref
+			self.name = name
+			self.region = region
+			self.association = association
+			self.altitude = altitude
+			self.lat = lat
+			self.lon = lon
+
+	@classmethod
+	def from_joined_db(cls, e, prefix):
+		return cls(
+			fetch_from_db = False,
+			ref = e[prefix+'ref'],
+			name = e[prefix+'name'],
+			region = e[prefix+'region'],
+			association = e[prefix+'association'],
+			altitude = e[prefix+'altitude'],
+			lat = e[prefix+'lat'],
+			lon = e[prefix+'lon']
+		)
 
 	def __str__(self):
 		return '%s (%im), %s, %s' % (self.name, self.altitude, self.region, self.association)
