@@ -30,11 +30,11 @@ table.fixedheader th {
 }
 
 
-.modebadge { width: 3em; }
+.modebadge { min-width: 3em; }
 .badge.mode-data { background-color: #363636; }
 .badge.mode-other { background-color: #363636; }
 .badge.mode-ssb { background-color: #a19a36; }
 .badge.mode-cw { background-color: #2b4970; }
 .badge.mode-fm { background-color: #a7385a; }
 
-
+.qsocount { min-width: 3em; }

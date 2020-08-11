@@ -21,7 +21,7 @@
 		<td>{{ summit.region }}</td>
 		<td>{{ summit.association }}</td>
 		<td>{{ summit.altitude }}m</td>
-		<td><a href="{{ url_for('logbook', s='my_sota_ref = "%s"' % summit.my_sota_ref) }}">{{ summit.qsos }}</a></td>
+		<td><a class="badge badge-pill badge-secondary qsocount" href="{{ url_for('logbook', s='my_sota_ref = "%s"' % summit.my_sota_ref) }}">{{ summit.qsos }}</a></td>
 		<td>{{ summit.last_activation.strftime("%d.%m.%y") }}</td>
 	</tr>
 	{%- endfor %}
