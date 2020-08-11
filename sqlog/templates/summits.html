@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<table class="table table-striped fixedheader">
+	<thead>
+		<tr>
+			<th scope="col">Summit</th>
+			<th scope="col">Name</th>
+			<th scope="col">Region</th>
+			<th scope="col">Association</th>
+			<th scope="col">Altitude</th>
+			<th scope="col">QSOs</th>
+			<th scope="col">Last Activation</th>
+		</tr>
+	</thead>
+	<tbody>
+	{% for summit in summits %}
+	<tr>
+		<td>{{ flag(summit.my_sota_ref, True) }}{{ summit_link(summit.my_sota_ref) }}</td>
+		<td>{{ summit.name }}</td>
+		<td>{{ summit.region }}</td>
+		<td>{{ summit.association }}</td>
+		<td>{{ summit.altitude }}m</td>
+		<td><a href="{{ url_for('logbook', s='my_sota_ref = "%s"' % summit.my_sota_ref) }}">{{ summit.qsos }}</a></td>
+		<td>{{ summit.last_activation.strftime("%d.%m.%y") }}</td>
+	</tr>
+	{%- endfor %}
+	</tbody>
+</table>
+{% endblock %}

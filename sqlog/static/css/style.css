@@ -25,4 +25,16 @@ table.fixedheader th {
 	position: sticky;
 	top: 0px;
 	background: white; /* prevent transparent during scrolling */
+	z-index: 10;
+	border-top: 0;
 }
+
+
+.modebadge { width: 3em; }
+.badge.mode-data { background-color: #363636; }
+.badge.mode-other { background-color: #363636; }
+.badge.mode-ssb { background-color: #a19a36; }
+.badge.mode-cw { background-color: #2b4970; }
+.badge.mode-fm { background-color: #a7385a; }
+
+

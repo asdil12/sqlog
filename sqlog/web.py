@@ -9,6 +9,8 @@ import pymysql
 
 import sqlog
 import sqlog.qso
+import sqlog.sota
+from sqlog.callsign import Callsign
 
 
 sqlog.Config.load(os.environ.get('CONFIG', 'config.cfg'))
@@ -25,7 +27,20 @@ def utility_processor():
 		return 'active' if active else ''
 	def summit_link(ref):
 		return Markup('<a href="https://sotl.as/summits/%s">%s</a>' % (ref,ref)) if ref else ref
-	return {'nav_active': nav_active, 'summit_link': summit_link}
+		#TODO: this is too slow:
+		#return Markup('<a href="https://sotl.as/summits/%s" title="%s">%s</a>' % (ref, sqlog.sota.Summit(ref), ref)) if ref else ref
+	def flag(callsign, sota=False):
+		classes = 'flag fp fp-md fp-rounded'
+		if isinstance(callsign, str):
+			if sota:
+				callsign = callsign.split('/')[0]
+			callsign = Callsign(callsign)
+		if callsign.roaming_country:
+			roaming_country = '<span class="abs"><span title="%s" class="%s fp-clip %s"></span></span>' % (callsign.roaming_country, classes, callsign.roaming_country.iso.lower())
+			return Markup('%s<span title="%s" class="%s %s"></span>' % (roaming_country, callsign.country, classes, callsign.country.iso.lower()))
+		else:
+			return Markup('<span title="%s" class="%s %s"></span>' % (callsign.country, classes, callsign.country.iso.lower()))
+	return {'nav_active': nav_active, 'summit_link': summit_link, 'flag': flag}
 
 @app.route('/')
 def logbook():

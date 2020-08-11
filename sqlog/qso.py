@@ -6,6 +6,7 @@ from hamutils.adif.common import convert_freq_to_band
 
 import sqlog.geo
 import sqlog.sota
+from sqlog.callsign import Callsign
 
 
 #TODO: get this at runtime from DB using MYSQL DESCRIBE command or something like that
@@ -173,6 +174,9 @@ class QSO(object):
 		_ensure_uppercase_field('sota_ref')
 		_ensure_uppercase_field('my_gridsquare')
 		_ensure_uppercase_field('gridsquare')
+
+		self.data['my_callsign'] = Callsign(self.data['my_callsign'])
+		self.data['callsign'] = Callsign(self.data['callsign'])
 
 	@classmethod
 	def from_adi(cls, adi):

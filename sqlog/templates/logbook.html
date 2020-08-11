@@ -22,11 +22,11 @@
 	<tr>
 		<td>{{ qso.date.strftime("%d.%m.%y") }}</td>
 		<td>{{ qso.time.strftime("%H:%M") }}</td>
-		<td>{{ qso.callsign }}</td>
+		<td>{{ flag(qso.callsign) }}{{ qso.callsign }}</td>
 		<td>{{ qso.band }}</td>
-		<td>{{ qso.mode }}</td>
-		<td>{{ summit_link(qso.my_sota_ref) }}</td>
-		<td>{{ summit_link(qso.sota_ref) }}</td>
+		<td><span class="badge badge-dark modebadge mode-{{ qso.mode|lower }}">{{ qso.mode }}</span></td>
+		<td>{{ flag(qso.my_sota_ref, True) if qso.my_sota_ref }}{{ summit_link(qso.my_sota_ref) }}</td>
+		<td>{{ flag(qso.sota_ref, True) if qso.sota_ref }}{{ summit_link(qso.sota_ref) }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.remarks if qso.remarks }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.my_callsign }}</td>
