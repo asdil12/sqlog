@@ -1541,6 +1541,10 @@ class Country(object):
 	def __str__(self):
 		return "%s, %s" % (self.name, self.continent)
 
+	def translate(self, t):
+		# little hack to allow pymysql to treat this like a str
+		return self.callsign.translate(t)
+
 class Callsign(object):
 	def __init__(self, callsign):
 		self.callsign = callsign.upper()
@@ -1569,3 +1573,7 @@ class Callsign(object):
 
 	def __str__(self):
 		return self.callsign
+
+	def translate(self, t):
+		# little hack to allow pymysql to treat this like a str
+		return self.callsign.translate(t)
