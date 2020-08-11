@@ -30,6 +30,7 @@ def utility_processor():
 		#TODO: this is too slow:
 		#return Markup('<a href="https://sotl.as/summits/%s" title="%s">%s</a>' % (ref, sqlog.sota.Summit(ref), ref)) if ref else ref
 	def flag(callsign, sota=False):
+		#FIXME: html escaping
 		classes = 'flag fp fp-md fp-rounded'
 		if isinstance(callsign, str):
 			if sota:
