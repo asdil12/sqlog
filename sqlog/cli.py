@@ -34,6 +34,7 @@ if args.command == 'import':
 		qsos = sqlog.load.read_csv(args.file)
 	else:
 		qsos = sqlog.load.read_adi(args.file)
-	sqlog.load.import_qsos(qsos)
+	for qso in sqlog.load.import_qsos(qsos):
+		print(repr(qso))
 elif args.command == 'sotarefresh':
 	sqlog.sota.update_db(not args.no_download)
