@@ -1,0 +1,21 @@
+language: python
+
+services:
+  - mysql
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y install python3-pip python3-setuptools python3-dateutil python3-flask python3-requests python3-pymysql
+  - sudo pip3 install git+https://github.com/sq8kfh/hamutils
+  - mysql -uroot -e "CREATE DATABASE \`sqlog\`"
+  - sed -i -e 's/linux//' config.cfg
+  - cp tdata/summitslist.csv ./
+
+script:
+  - mysql -uroot sqlog < db.sql
+  - ./sqlog/cli.py --help
+  - ./sqlog/cli.py sotarefresh --no-download
+  - ./sqlog/cli.py import ./tdata/qsofiles/001_sota.csv | tee /tmp/import.log
+  - grep EA7GV /tmp/import.log
+  - ./sqlog/cli.py import ./tdata/qsofiles/002_OutdLog-20200807.adif | tee /tmp/import.log
+  - grep DF4TD /tmp/import.log
