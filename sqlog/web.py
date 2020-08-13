@@ -4,8 +4,9 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
 
-from flask import Flask, Markup, render_template, request
+from flask import Flask, Markup, Response, render_template, request
 import pymysql
+import json
 
 import sqlog
 from sqlog.qso import QSO
@@ -40,6 +41,14 @@ def utility_processor():
 		else:
 			return Markup('<span title="%s" class="%s %s"></span>' % (callsign.country, classes, callsign.country.iso.lower()))
 	return {'nav_active': nav_active, 'summit_link': summit_link, 'flag': flag}
+
+def sse(items):
+	def _sees(items):
+		for e in items:
+			yield "data: %s\n\n" % json.dumps(e)
+		yield "data: %s\n\n" % json.dumps({'close': True})
+	return Response(_sees(items), mimetype='text/event-stream')
+
 
 @app.route('/')
 def logbook():
@@ -88,11 +97,12 @@ def summits():
 	finally:
 		connection.close()
 
-@app.route('/sota/refresh', methods=['GET', 'POST'])
-def sotarefresh():
-	if request.method == 'POST':
-		sqlog.sota.update_db()
-
+@app.route('/sota/refresh')
+def sota_refresh():
+	if request.args.get('refresh') == '1':
+		return sse(sqlog.sota.update_db())
+	else:
+		return render_template('sota_refresh.html')
 
 if __name__ == '__main__':
 	app.run(debug=True)
