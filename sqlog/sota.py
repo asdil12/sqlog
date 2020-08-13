@@ -23,38 +23,41 @@ def update_db(download=True):
 		except FileNotFoundError:
 			file_last_updated = datetime.datetime.fromtimestamp(0)
 		if parsedate(r.headers['last-modified']) > file_last_updated.replace(tzinfo=datetime.timezone.utc):
-			sys.stdout.flush()
 			r = requests.get(url, allow_redirects=True, stream=True)
 			with open(SUMMIT_DB_FILE, 'wb') as f:
-				print('Downloading summits ', end='')
-				for chunk in r.iter_content(1024 * 1024):
-					sys.stdout.write('.')
-					sys.stdout.flush()
+				yield 'Downloading summits '
+				for chunk in r.iter_content(1024 * 150):
+					yield '.'
 					f.write(chunk)
-				sys.stdout.write("\n")
+				yield "\n"
 
 	# import CSV into MySQL database
 	connection = sqlog.mysql_connection()
 	try:
 		with connection.cursor() as cursor:
-			def _summits():
-				f = open(SUMMIT_DB_FILE, 'r')
-				f.readline()  # skip first line that looks like "SOTA Summits List (Date=29/06/2020)"
-				print('Importing summits ', end='')
-				sys.stdout.flush()
+			f = open(SUMMIT_DB_FILE, 'r')
+			f.readline()  # skip first line that looks like "SOTA Summits List (Date=29/06/2020)"
+			yield 'Importing summits '
+			summits = csv.DictReader(f)
+			def _summits(n):
+				global csv_empty
 				i = 0
-				for summit in csv.DictReader(f):
-					i += 1
-					if i % 1000 == 0:
-						sys.stdout.write('.')
-						sys.stdout.flush()
+				for summit in summits:
 					yield summit
+					i += 1
+					if i >= n:
+						break
 			cursor.execute("DELETE FROM summits")
 			connection.commit()
-			cursor.executemany("""INSERT INTO summits (ref, name, region, association, altitude, lat, lon)
-			                      VALUES (%(SummitCode)s, %(SummitName)s, %(RegionName)s, %(AssociationName)s, %(AltM)s, %(Latitude)s, %(Longitude)s)""", _summits())
+			while True:
+				try:
+					cursor.executemany("""INSERT INTO summits (ref, name, region, association, altitude, lat, lon)
+					                      VALUES (%(SummitCode)s, %(SummitName)s, %(RegionName)s, %(AssociationName)s, %(AltM)s, %(Latitude)s, %(Longitude)s)""", _summits(1000))
+					yield '.'
+				except StopIteration:
+					break
 			connection.commit()
-			sys.stdout.write("\n")
+			yield "\n"
 	finally:
 		connection.close()
 

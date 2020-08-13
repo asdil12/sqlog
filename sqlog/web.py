@@ -88,6 +88,11 @@ def summits():
 	finally:
 		connection.close()
 
+@app.route('/sota/refresh', methods=['GET', 'POST'])
+def sotarefresh():
+	if request.method == 'POST':
+		sqlog.sota.update_db()
+
 
 if __name__ == '__main__':
 	app.run(debug=True)

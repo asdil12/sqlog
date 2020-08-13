@@ -37,4 +37,6 @@ if args.command == 'import':
 	for qso in sqlog.load.import_qsos(qsos):
 		print(repr(qso))
 elif args.command == 'sotarefresh':
-	sqlog.sota.update_db(not args.no_download)
+	for s in sqlog.sota.update_db(not args.no_download):
+		sys.stdout.write(s)
+		sys.stdout.flush()
