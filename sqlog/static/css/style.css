@@ -21,6 +21,16 @@
 	margin-left: 8px;
 }
 
+.top-searchbar:focus {
+	color: #fff;
+	background-color: rgba(255, 255, 255, .2);
+	box-shadow: 0 0 0 0.1rem rgba(255,255,255,.25);
+}
+
+.navbar-brand img {
+	filter: drop-shadow(0px 1px 1px rgba(255, 255, 255, .2));
+}
+
 table.fixedheader th {
 	position: sticky;
 	top: 0px;

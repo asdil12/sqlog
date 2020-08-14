@@ -9,12 +9,13 @@
 		<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-4.5.0-dist/css/bootstrap.min.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/flags.css') }}">
-		<title>{% block title %}{% endblock %}</title>
+		<link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo_sm.png') }}" />
+		<title>{% block title %}SQLog{% endblock %}</title>
 	</head>
 	<body>
 		{% block nav %}
 		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-			<a class="navbar-brand" href="#">SQLog</a>
+			<a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo_sm.png') }}" width="30" height="30" class="d-inline-block align-top" alt=""> SQLog</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"><span class="navbar-toggler-icon"></span></button>
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
 				<ul class="navbar-nav mr-auto">
@@ -37,7 +38,7 @@
 					</li>
 				</ul>
 				<form class="form-inline flex-fill" method="GET" action="{{ url_for('logbook') }}">
-					<input type="text" name="s" id="s" value="{{ s }}" class="form-control top-searchbar" placeholder="Search">
+					<input type="text" spellcheck="false" name="s" id="s" value="{{ s }}" class="form-control top-searchbar" placeholder="Search">
 				</form>
 			</div>
 		</nav>
