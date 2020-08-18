@@ -26,7 +26,7 @@ def import_qsos(qsos):
 
 def read_adi(filename):
 	with open(filename, 'r', encoding="ascii") as f:
-		read_adi_fp(f)
+		yield from read_adi_fp(f)
 
 def read_adi_fp(f):
 	for qso in hamutils.adif.ADIReader(f):
@@ -34,7 +34,7 @@ def read_adi_fp(f):
 
 def read_csv(filename):
 	with open(filename, 'r', encoding="ascii") as f:
-		read_csv_fp(f)
+		yield from read_csv_fp(f)
 
 def read_csv_fp(f):
 	fields = ('version', 'my_callsign', 'my_sota_ref', 'date', 'time', 'freq', 'mode', 'callsign', 'sota_ref', 'remarks')
