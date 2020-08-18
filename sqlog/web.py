@@ -117,5 +117,9 @@ def sota_refresh():
 	else:
 		return render_template('sota_refresh.html')
 
+@app.route('/map')
+def qso_map():
+	return render_template('map.html')
+
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0')

@@ -13,19 +13,20 @@
 		<title>{% block title %}SQLog{% endblock %}</title>
 	</head>
 	<body>
+		<div class="container-fluid min-100 d-flex flex-column">
 		{% block nav %}
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<nav class="row navbar navbar-expand-lg navbar-dark bg-dark flex-shrink-0">
 			<a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo_sm.png') }}" width="30" height="30" class="d-inline-block align-top" alt=""> SQLog</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"><span class="navbar-toggler-icon"></span></button>
 			<div class="collapse navbar-collapse" id="navbarNavDropdown">
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item {{ nav_active('logbook') }}"><a class="nav-link" href="{{ url_for('logbook') }}">Logbook</a></li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
+						<a class="nav-link dropdown-toggle {{ nav_active(('qso_import')) }}" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
 						<div class="dropdown-menu">
 							<a class="dropdown-item" href="#">New QSO</a>
 							<a class="dropdown-item" href="#">Write QSL Cards</a>
-							<a class="dropdown-item" href="#">Import QSOs</a>
+							<a class="dropdown-item" href="{{ url_for('qso_import') }}">Import QSOs</a>
 							<a class="dropdown-item" href="#">Export QSOs</a>
 						</div>
 					</li>
@@ -43,8 +44,11 @@
 			</div>
 		</nav>
 		{% endblock %}
+		<div class="row flex-grow-1" style="position: relative;">
 		{% block body %}
 		{% endblock %}
+		</div>
+		</div>
 
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
