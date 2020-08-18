@@ -7,8 +7,10 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
 from flask import Flask, Markup, Response, render_template, request
 import pymysql
 import json
+from io import TextIOWrapper
 
 import sqlog
+import sqlog.load
 from sqlog.qso import QSO
 from sqlog.sota import Summit
 from sqlog.callsign import Callsign
@@ -96,6 +98,17 @@ def summits():
 			return render_template('summits.html', summit_items=summit_items)
 	finally:
 		connection.close()
+
+@app.route('/qso/import', methods=['GET', 'POST'])
+def qso_import():
+	if request.method == 'POST':
+		logfile = request.files["logfile"]
+		logfp = TextIOWrapper(logfile, encoding='ascii')
+		qsos = sqlog.load.read_fp(logfp, logfile.filename)
+		imported_qsos = map(repr, sqlog.load.import_qsos(qsos))
+	else:
+		imported_qsos = []
+	return render_template('qso_import.html', imported_qsos=imported_qsos)
 
 @app.route('/sota/refresh')
 def sota_refresh():

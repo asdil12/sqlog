@@ -30,10 +30,7 @@ args = parser.parse_args()
 sqlog.Config.load(args.config)
 
 if args.command == 'import':
-	if args.file.endswith('csv'):
-		qsos = sqlog.load.read_csv(args.file)
-	else:
-		qsos = sqlog.load.read_adi(args.file)
+	qsos = sqlog.load.read_file(args.file)
 	for qso in sqlog.load.import_qsos(qsos):
 		print(repr(qso))
 elif args.command == 'sotarefresh':

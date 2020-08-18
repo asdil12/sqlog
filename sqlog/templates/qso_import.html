@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block body %}
+	<script type="text/javascript">
+		function sota_refresh() {
+			var source = new EventSource("{{ url_for('sota_refresh', refresh=1) }}");
+			source.onmessage = function(event) {
+			var e = JSON.parse(event.data);
+			if (typeof(e) == 'string') {
+				document.getElementById("result").innerHTML += e;
+			}
+			else if (typeof(e) == 'object' && 'close' in e && e['close']) {
+				source.close();
+			}
+		};
+	}
+	</script>
+	<div style="margin: 10px; width: 100%;">
+		<form method="POST" enctype="multipart/form-data">
+			<input type="file" name="logfile" />
+			<input type="submit" value="Import" />
+		</form>
+	</div>
+	<div style="margin: 10px;">
+		<pre><code id="result">{{ "\n".join(imported_qsos) }}</code></pre>
+	</div>
+{% endblock %}
