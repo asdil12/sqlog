@@ -1786,6 +1786,7 @@ class Country(object):
 		while callsign:
 			if callsign in prefix_to_country:
 				self.iso, continent_abbr = prefix_to_country[callsign]
+				break
 			callsign = callsign[:-1]
 		self.name = country_names[self.iso]
 		self.continent = continent_names[continent_abbr]
