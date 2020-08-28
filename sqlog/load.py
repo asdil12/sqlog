@@ -16,6 +16,7 @@ def import_qsos(qsos):
 			for qso in qsos:
 				yield qso
 				cursor.execute('INSERT INTO qsos (%s) VALUES (%s)' % (field_keys, field_values), qso.data)
+				qso.id = cursor.lastrowid
 				connection.commit()
 	except:
 		yield qso.data

@@ -28,8 +28,10 @@ def utility_processor():
 		else:
 			active = (request.endpoint in endpoint)
 		return 'active' if active else ''
-	def summit_link(summit):
+	def summit_link(summit, query_db=False):
 		ref = summit.ref if isinstance(summit, Summit) else summit
+		if query_db and not isinstance(summit, Summit) and ref:
+			summit = Summit(ref)
 		return Markup('<a title="%s" href="https://sotl.as/summits/%s">%s</a>') % (summit, ref, ref) if ref else ''
 	def flag(callsign, sota=False):
 		classes = 'flag fp fp-md fp-rounded'
@@ -98,6 +100,17 @@ def summits():
 			return render_template('summits.html', summit_items=summit_items)
 	finally:
 		connection.close()
+
+@app.route('/qso/<int:qso_id>')
+def qso_show(qso_id):
+	connection = sqlog.mysql_connection()
+	try:
+		with connection.cursor() as cursor:
+			cursor.execute("SELECT * FROM qsos WHERE id = '%s'", qso_id)
+			return render_template('qso.html', qso=QSO(cursor.fetchone()))
+	finally:
+		connection.close()
+
 
 @app.route('/qso/import', methods=['GET', 'POST'])
 def qso_import():

@@ -38,11 +38,13 @@ CREATE TABLE `qsos` (
   `my_gridsquare` varchar(6) DEFAULT NULL,
   `my_lat` float DEFAULT NULL,
   `my_lon` float DEFAULT NULL,
+  `my_geoaccuracy` varchar(4) DEFAULT NULL,
   `qth` varchar(128) DEFAULT NULL,
   `sota_ref` varchar(16) DEFAULT NULL,
   `gridsquare` varchar(6) DEFAULT NULL,
   `lat` float DEFAULT NULL,
   `lon` float DEFAULT NULL,
+  `geoaccuracy` varchar(4) DEFAULT NULL,
   `distance` float DEFAULT NULL,
   `remarks` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

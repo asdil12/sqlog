@@ -8,7 +8,14 @@
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-4.5.0-dist/css/bootstrap.min.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+		<!-- Country Flags -->
 		<link rel="stylesheet" href="{{ url_for('static', filename='css/flags.css') }}">
+
+		<!-- Map -->
+		<link rel="stylesheet" href="{{ url_for('static', filename='leaflet/leaflet.css') }}">
+		<script src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+
 		<link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo_sm.png') }}" />
 		<title>{% block title %}SQLog{% endblock %}</title>
 	</head>
@@ -22,7 +29,7 @@
 				<ul class="navbar-nav mr-auto">
 					<li class="nav-item {{ nav_active('logbook') }}"><a class="nav-link" href="{{ url_for('logbook') }}">Logbook</a></li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle {{ nav_active(('qso_import')) }}" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
+						<a class="nav-link dropdown-toggle {{ nav_active(('qso_import', 'qso_show')) }}" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown">QSOs</a>
 						<div class="dropdown-menu">
 							<a class="dropdown-item" href="#">New QSO</a>
 							<a class="dropdown-item" href="#">Write QSL Cards</a>

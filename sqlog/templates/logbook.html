@@ -22,7 +22,7 @@
 	<tr>
 		<td>{{ qso.date.strftime("%d.%m.%y") }}</td>
 		<td>{{ qso.time.strftime("%H:%M") }}</td>
-		<td>{{ flag(qso.callsign) }}{{ qso.callsign }}</td>
+		<td>{{ flag(qso.callsign) }}<a href="{{ url_for('qso_show', qso_id=qso.id) }}">{{ qso.callsign }}</a></td>
 		<td>{{ qso.band }}</td>
 		<td><span class="badge badge-dark modebadge mode-{{ qso.mode|lower }}">{{ qso.mode }}</span></td>
 		<td>{{ flag(qso.my_sota_ref, True) if qso.my_sota_ref }}{{ summit_link(my_summit) }}</td>

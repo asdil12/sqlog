@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import datetime
+from enum import IntEnum
 
 from hamutils.adif.common import convert_freq_to_band
 
@@ -8,175 +9,151 @@ import sqlog.geo
 import sqlog.sota
 from sqlog.callsign import Callsign
 
+fields = ('id', 'datetime', 'my_callsign', 'callsign', 'name', 'freq', 'band', 'mode', 'rst_rcvd', 'rst_sent', 'qsl', 'my_qth', 'my_sota_ref', 'my_gridsquare', 'my_lat', 'my_lon', 'my_geoaccuracy', 'qth', 'sota_ref', 'gridsquare', 'lat', 'lon', 'geoaccuracy', 'distance', 'remarks')
 
-#TODO: get this at runtime from DB using MYSQL DESCRIBE command or something like that
-fields = ('datetime', 'my_callsign', 'callsign', 'name', 'freq', 'band', 'mode', 'rst_rcvd', 'rst_sent', 'qsl', 'my_qth', 'my_sota_ref', 'my_gridsquare', 'my_lat', 'my_lon', 'qth', 'sota_ref', 'gridsquare', 'lat', 'lon', 'distance', 'remarks')
+class GeoAccuracy(IntEnum):
+	USER = 10
+	SOTA = 20
+	GRID = 50
+	CALL = 40
 
 class QSO(object):
 	def __init__(self, data={}, **kwdata):
-		self.data = data
-		self.data.update(kwdata)
-		self.prepare_fields()
+		d = data.copy()
+		d.update(kwdata)
+
+		self.id = d.get('id', None)
+		self.datetime = d.get('datetime', None)
+		self.my_callsign = d.get('my_callsign', None)
+		self.callsign = d.get('callsign', None)
+		self.name = d.get('name', None)
+		self.freq = d.get('freq', None)
+		self.band = d.get('band', None)
+		self.mode = d.get('mode', None)
+		self.rst_rcvd = d.get('rst_rcvd', None)
+		self.rst_sent = d.get('rst_sent', None)
+		self.qsl = d.get('qsl', None)
+		self.my_qth = d.get('my_qth', None)
+		self.my_sota_ref = d.get('my_sota_ref', None)
+		self.my_gridsquare = d.get('my_gridsquare', None)
+		self.my_lat = d.get('my_lat', None)
+		self.my_lon = d.get('my_lon', None)
+		self.my_geoaccuracy = d.get('my_geoaccuracy', None)
+		self.qth = d.get('qth', None)
+		self.sota_ref = d.get('sota_ref', None)
+		self.gridsquare = d.get('gridsquare', None)
+		self.lat = d.get('lat', None)
+		self.lon = d.get('lon', None)
+		self.geoaccuracy = d.get('geoaccuracy', None)
+		self.distance = d.get('distance', None)
+		self.remarks = d.get('remarks', None)
+
+		# Create Callsign objects
+		self.my_callsign = Callsign(self.my_callsign)
+		self.callsign = Callsign(self.callsign)
+
+		# Create GeoAccuracy objects
+		if not isinstance(self.my_geoaccuracy, GeoAccuracy):
+			self.my_geoaccuracy = GeoAccuracy[self.my_geoaccuracy] if self.my_geoaccuracy else None
+		if not isinstance(self.geoaccuracy, GeoAccuracy):
+			self.geoaccuracy = GeoAccuracy[self.geoaccuracy] if self.geoaccuracy else None
+
+		if not self.my_geoaccuracy and self.my_pos:
+			self.my_geoaccuracy = GeoAccuracy.USER
+		if not self.geoaccuracy and self.pos:
+			self.geoaccuracy = GeoAccuracy.USER
+
+		if self.my_sota_ref and not (self.my_pos and self.my_qth):
+			my_summit = sqlog.sota.Summit(self.my_sota_ref)
+			# Set coordinates based on SOTA
+			if not self.pos:
+				self.my_lat = my_summit.lat
+				self.my_lon = my_summit.lon
+				self.my_geoaccuracy = GeoAccuracy.SOTA
+			# Set QTH based on SOTA
+			if not self.my_qth:
+				self.my_qth = str(my_summit)
+
+		if self.sota_ref and not (self.pos and self.qth):
+			summit = sqlog.sota.Summit(self.sota_ref)
+			# Set coordinates based on SOTA
+			if not self.pos:
+				self.lat = summit.lat
+				self.lon = summit.lon
+				self.geoaccuracy = GeoAccuracy.SOTA
+			# Set QTH based on SOTA
+			if not self.qth:
+				self.qth = str(summit)
+
+		# Set locator based on coordinates
+		if not self.my_gridsquare and self.my_pos:
+			self.my_gridsquare = sqlog.geo.gridsquare(self.my_lat, self.my_lon)
+		if not self.gridsquare and self.pos:
+			self.gridsquare = sqlog.geo.gridsquare(self.lat, self.lon)
+
+		# Set coordinates based on locator
+		if self.my_gridsquare and not self.my_pos:
+			self.my_lat, self.my_lon = sqlog.geo.location(self.my_gridsquare)
+			self.my_geoaccuracy = GeoAccuracy.GRID
+		if self.gridsquare and not self.pos:
+			self.lat, self.lon = sqlog.geo.location(self.gridsquare)
+			self.geoaccuracy = GeoAccuracy.GRID
+
+		# Set coordinates based on Callsign
+		if not self.my_pos:
+			country = self.my_callsign.roaming_country if self.my_callsign.roaming_country else self.my_callsign.country
+			self.my_lat = country.lat
+			self.my_lon = country.lon
+			self.my_geoaccuracy = GeoAccuracy.CALL
+		if not self.pos:
+			country = self.callsign.roaming_country if self.callsign.roaming_country else self.callsign.country
+			self.lat = country.lat
+			self.lon = country.lon
+			self.geoaccuracy = GeoAccuracy.CALL
+
+		# Set distance based on coordinates if geoaccuracy is sufficient
+		if self.my_geoaccuracy >= GeoAccuracy.GRID and self.geoaccuracy >= GeoAccuracy.GRID:
+			if self.my_pos and pos:
+				if not isinstance(self.distance, float):
+					self.distance = sqlog.geo.distance(self.my_lat, self.my_lon, self.lat, self.lon)
+
+		# Get band from freq if not set
+		if self.freq and not self.band:
+			self.band = convert_freq_to_band(self.freq)
+
+		# Ensure that some fields are uppercase
+		self.my_sota_ref = self.my_sota_ref.upper() if self.my_sota_ref else self.my_sota_ref
+		self.sota_ref = self.sota_ref.upper() if self.sota_ref else self.sota_ref
+		self.my_gridsquare = self.my_gridsquare.upper() if self.my_gridsquare else self.my_gridsquare
+		self.gridsquare = self.gridsquare.upper() if self.gridsquare else self.gridsquare
 
 	@property
-	def datetime(self):
-		return self.data['datetime']
+	def data(self):
+		d = {}
+		for field in fields:
+			d[field] = getattr(self, field)
+			if field == 'my_geoaccuracy' or field == 'geoaccuracy':
+				d[field] = d[field].name if d[field] else None
+		return d
 
 	@property
 	def date(self):
-		return self.data['datetime'].date()
+		return self.datetime.date()
 
 	@property
 	def time(self):
-		return self.data['datetime'].time()
+		return self.datetime.time()
 
 	@property
-	def my_callsign(self):
-		return self.data['my_callsign']
+	def my_pos(self):
+		return (self.my_lat, self.my_lat) if (isinstance(self.my_lat, float) and isinstance(self.my_lon, float)) else None
 
 	@property
-	def callsign(self):
-		return self.data['callsign']
-
-	@property
-	def name(self):
-		return self.data['name']
-
-	@property
-	def freq(self):
-		return self.data['freq']
-
-	@property
-	def band(self):
-		return self.data['band']
-
-	@property
-	def mode(self):
-		return self.data['mode']
-
-	@property
-	def rst_rcvd(self):
-		return self.data['rst_rcvd']
-
-	@property
-	def rst_sent(self):
-		return self.data['rst_sent']
-
-	@property
-	def qsl(self):
-		return self.data['qsl']
-
-	@property
-	def my_qth(self):
-		return self.data['my_qth']
-
-	@property
-	def my_sota_ref(self):
-		return self.data['my_sota_ref']
-
-	@property
-	def my_gridsquare(self):
-		return self.data['my_gridsquare']
-
-	@property
-	def my_lat(self):
-		return self.data['my_lat']
-
-	@property
-	def my_lon(self):
-		return self.data['my_lon']
-
-	@property
-	def qth(self):
-		return self.data['qth']
-
-	@property
-	def sota_ref(self):
-		return self.data['sota_ref']
-
-	@property
-	def gridsquare(self):
-		return self.data['gridsquare']
-
-	@property
-	def lat(self):
-		return self.data['lat']
-
-	@property
-	def lon(self):
-		return self.data['lon']
-
-	@property
-	def distance(self):
-		return self.data['distance']
-
-	@property
-	def remarks(self):
-		return self.data['remarks']
+	def pos(self):
+		return (self.lat, self.lat) if (isinstance(self.lat, float) and isinstance(self.lon, float)) else None
 
 	def __repr__(self):
-		return 'QSO(%s)' % ', '.join(['%s=%s' % (ks, self.data[k]) for k, ks in (('datetime', 'dt'), ('callsign', 'call'), ('my_sota_ref', 'sota')) if self.data[k]])
-
-	def prepare_fields(self):
-		d = self.data
-		self.data = {}
-		for field in fields:
-			self.data[field] = d.get(field, None)
-
-		if self.data['my_sota_ref'] and not (self.data['my_lat'] and self.data['my_lon'] and self.data['my_qth']):
-			my_summit = sqlog.sota.Summit(self.data['my_sota_ref'])
-			# Set coordinates based on SOTA
-			if not (self.data['my_lat'] and self.data['my_lon']):
-				self.data['my_lat'] = my_summit.lat
-				self.data['my_lon'] = my_summit.lon
-			# Set QTH based on SOTA
-			if not self.data['my_qth']:
-				self.data['my_qth'] = str(my_summit)
-
-		if self.data['sota_ref'] and not (self.data['lat'] and self.data['lon'] and self.data['qth']):
-			summit = sqlog.sota.Summit(self.data['sota_ref'])
-			# Set coordinates based on SOTA
-			if not (self.data['lat'] and self.data['lon']):
-				self.data['lat'] = summit.lat
-				self.data['lon'] = summit.lon
-			# Set QTH based on SOTA
-			if not self.data['qth']:
-				self.data['qth'] = str(summit)
-
-		# Set locator based on coordinates
-		if not self.data['my_gridsquare'] and (self.data['my_lat'] and self.data['my_lon']):
-			self.data['my_gridsquare'] = sqlog.geo.gridsquare(self.data['my_lat'], self.data['my_lon'])
-		if not self.data['gridsquare'] and (self.data['lat'] and self.data['lon']):
-			self.data['gridsquare'] = sqlog.geo.gridsquare(self.data['lat'], self.data['lon'])
-
-		# Set coordinates based on locator
-		if self.data['my_gridsquare'] and not (self.data['my_lat'] and self.data['my_lon']):
-			self.data['my_lat'], self.data['my_lon'] = sqlog.geo.location(self.data['my_gridsquare'])
-		if self.data['gridsquare'] and not (self.data['lat'] and self.data['lon']):
-			self.data['lat'], self.data['lon'] = sqlog.geo.location(self.data['gridsquare'])
-
-		# Set distance based on coordinates
-		if isinstance(self.data['my_lat'], float) and isinstance(self.data['my_lon'], float) and isinstance(self.data['lat'], float) and isinstance(self.data['lon'], float):
-			if not isinstance(self.data['distance'], float):
-				self.data['distance'] = sqlog.geo.distance(self.data['my_lat'], self.data['my_lon'], self.data['lat'], self.data['lon'])
-
-		# Get band from freq if not set
-		if self.data['freq'] and not self.data['band']:
-			self.data['band'] = convert_freq_to_band(self.data['freq'])
-
-		# Ensure that some fields are uppercase
-		def _ensure_uppercase_field(field):
-			if self.data[field]:
-				self.data[field] = self.data[field].upper()
-		_ensure_uppercase_field('my_callsign')
-		_ensure_uppercase_field('callsign')
-		_ensure_uppercase_field('my_sota_ref')
-		_ensure_uppercase_field('sota_ref')
-		_ensure_uppercase_field('my_gridsquare')
-		_ensure_uppercase_field('gridsquare')
-
-		self.data['my_callsign'] = Callsign(self.data['my_callsign'])
-		self.data['callsign'] = Callsign(self.data['callsign'])
+		return 'QSO(%s)' % ', '.join(['%s=%s' % (ks, getattr(self, k)) for k, ks in (('datetime', 'dt'), ('callsign', 'call'), ('my_sota_ref', 'sota')) if getattr(self, k)])
 
 	@classmethod
 	def from_adi(cls, adi):

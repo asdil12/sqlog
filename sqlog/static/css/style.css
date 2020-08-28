@@ -48,3 +48,9 @@ table.fixedheader th {
 .badge.mode-fm { background-color: #a7385a; }
 
 .qsocount { min-width: 3em; }
+
+
+
+.cardsmargin .card {
+	margin: 10px;
+}
