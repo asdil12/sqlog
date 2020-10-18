@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container d-flex flex-wrap cardsmargin">
+	<div class="card flex-grow-1">
+		<table class="table table-sm">
+			<tr>
+				<th>Date</th>
+				<th>UTC</th>
+				<th>Call</th>
+				<th>Band</th>
+				<th>Freq</th>
+				<th>Mode</th>
+				<th>RST</th>
+				<th>Distance</th>
+			</tr>
+			<tr>
+				<td>{{ qso.date.strftime("%d.%m.%Y") }}</td>
+				<td>{{ qso.time.strftime("%H:%M") }}</td>
+				<td>{{ flag(qso.callsign) }}{{ qso.callsign }}</td>
+				<td>{{ qso.band }}</td>
+				<td>{{ hide_decimal(qso.freq)|string + ' MHz' if 'qso.freq' else 'n/a' }}</td>
+				<td><span class="badge badge-dark modebadge mode-{{ qso.mode|lower }}">{{ qso.mode }}</span></td>
+				<td><span title="Sent">{% if not (qso.rst_sent or qso.rst_rcvd) %}n/a{% else %}{{ qso.rst_sent or '?' }}</span> / <span title="Received">{{ qso.rst_rcvd or '?' }}</span>{% endif %}</td>
+				<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance else 'n/a' }}</td>
+			</tr>
+		</table>
+		<table class="table table-sm">
+			<tr>
+				<th>Name</th>
+				<th>QTH</th>
+				<th>QSL</th>
+			</tr>
+			<tr>
+				<td>{{ qso.name or 'n/a' }}</td>
+				<td>{{ qso.qth or 'n/a' }}</td>
+				<td>{{ qso.qsl or 'n/a' }}</td>
+			</tr>
+			<tr><td style='border:none;' colspan="3"></td></tr>
+			<tr>
+				<th>My Call</th>
+				<th colspan="2">My QTH</th>
+			</tr>
+			<tr>
+				<td>{{ qso.my_callsign or 'n/a' }}</td>
+				<td colspan="2">{{ qso.my_qth or 'n/a' }}</td>
+			</tr>
+		</table>
+		<table class="table table-sm">
+			<tr><th>Remarks</th></tr>
+			<tr><td>{{ qso.remarks or 'n/a' }}</td></tr>
+		</table>
+		{% if my_summit %}
+		<table class="table table-sm">
+			<tr>
+				<th>My Summit</th>
+				<th>Name</th>
+				<th>Altitude</th>
+				<th>Region</th>
+				<th>Association</th>
+			</tr>
+			<tr>
+				<td>{{ flag(qso.my_sota_ref, True) }}{{ summit_link(my_summit) }}</td>
+				<td>{{ my_summit.name }}</td>
+				<td>{{ my_summit.altitude|string + 'm' }}</td>
+				<td>{{ my_summit.region }}</td>
+				<td>{{ my_summit.association }}</td>
+			</tr>
+		{% if not summit %}
+		</table>
+		{% endif %}
+		{% endif %}
+		{% if summit %}
+		{% if not my_summit %}
+		<table class="table table-sm">
+		{% else %}
+			<tr><td style='border:none;' colspan="5"></td></tr>
+		{% endif %}
+			<tr>
+				<th>Remote Summit</th>
+				<th>Name</th>
+				<th>Altitude</th>
+				<th>Region</th>
+				<th>Association</th>
+			</tr>
+			<tr>
+				<td>{{ flag(qso.sota_ref, True) }}{{ summit_link(summit) }}</td>
+				<td>{{ summit.name }}</td>
+				<td>{{ summit.altitude|string + 'm' }}</td>
+				<td>{{ summit.region }}</td>
+				<td>{{ summit.association }}</td>
+			</tr>
+		</table>
+		{% endif %}
+		<table class="table table-sm">
+			<tr>
+				<th>My Grid</th>
+				<th>My Lat</th>
+				<th>My Lon</th>
+				<th>My Accuracy</th>
+			</tr>
+			<tr>
+				<td>{{ qso.my_gridsquare }}</td>
+				<td>{{ qso.my_lat }}</td>
+				<td>{{ qso.my_lon }}</td>
+				<td>{{ qso.my_geoaccuracy }}</td>
+			</tr>
+			<tr><td style='border:none;' colspan="4"></td></tr>
+			<tr>
+				<th>Remote Grid</th>
+				<th>Remote Lat</th>
+				<th>Remote Lon</th>
+				<th>Remote Accuracy</th>
+			</tr>
+			<tr>
+				<td>{{ qso.gridsquare }}</td>
+				<td>{{ qso.lat }}</td>
+				<td>{{ qso.lon }}</td>
+				<td>{{ qso.geoaccuracy }}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="card" id="map" style="width: 350px; height: 300px;"></div>
+	<script type="text/javascript">
+		var mymap = L.map('map').setView([51.505, -0.09], 13);
+
+		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+		id: 'mapbox/streets-v11',
+		tileSize: 512,
+		zoomOffset: -1
+		}).addTo(mymap);
+
+		{% if qso.my_lat and qso.my_lon %}
+		var greyIcon = new L.Icon({
+			iconUrl: '{{ url_for("static", filename="leaflet/images/marker-icon-2x-grey.png") }}',
+			shadowUrl: '{{ url_for("static", filename="leaflet/images/marker-shadow.png") }}',
+			iconSize: [25, 41],
+			iconAnchor: [12, 41],
+			popupAnchor: [1, -34],
+			shadowSize: [41, 41]
+		});
+		var my_pos = [{{ qso.my_lat }}, {{ qso.my_lon }}];
+		var my_marker = L.marker(my_pos, {icon: greyIcon}).addTo(mymap);
+		{% endif %}
+
+		{% if qso.lat and qso.lon %}
+		var pos = [{{ qso.lat }}, {{ qso.lon }}];
+		var marker = L.marker(pos).addTo(mymap);
+		{% endif %}
+
+		if (my_pos && pos) {
+			var polyline = L.polyline([my_pos, pos], {color: 'red'}).addTo(mymap);
+			bounds = L.latLngBounds(my_pos, pos).pad(0.1);
+			mymap.fitBounds(bounds);
+		}
+		else if (pos) {
+			mymap.setView(pos, 5);
+		}
+		else if (my_pos) {
+			mymap.setView(my_pos, 5);
+		}
+	</script>
+</div>
+{% endblock %}

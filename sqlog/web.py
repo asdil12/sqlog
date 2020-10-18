@@ -44,7 +44,12 @@ def utility_processor():
 			return Markup('%s<span title="%s" class="%s %s"></span>') % (roaming_country, callsign.country, classes, callsign.country.iso.lower())
 		else:
 			return Markup('<span title="%s" class="%s %s"></span>' % (callsign.country, classes, callsign.country.iso.lower()))
-	return {'nav_active': nav_active, 'summit_link': summit_link, 'flag': flag}
+	def hide_decimal(f):
+		if int(f) == f:
+			return int(f)
+		else:
+			return f
+	return {'nav_active': nav_active, 'summit_link': summit_link, 'flag': flag, 'hide_decimal': hide_decimal}
 
 def sse(items):
 	def _sees(items):
@@ -107,7 +112,10 @@ def qso_show(qso_id):
 	try:
 		with connection.cursor() as cursor:
 			cursor.execute("SELECT * FROM qsos WHERE id = '%s'", qso_id)
-			return render_template('qso.html', qso=QSO(cursor.fetchone()))
+			qso = QSO(cursor.fetchone())
+			my_summit = Summit(qso.my_sota_ref) if qso.my_sota_ref else None
+			summit = Summit(qso.sota_ref) if qso.sota_ref else None
+			return render_template('qso.html', qso=qso, my_summit=my_summit, summit=summit)
 	finally:
 		connection.close()
 
