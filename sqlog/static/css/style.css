@@ -54,3 +54,7 @@ table.fixedheader th {
 .cardsmargin .card {
 	margin: 10px;
 }
+
+.nowrap {
+	white-space: nowrap;
+}

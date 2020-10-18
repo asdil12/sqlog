@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<table class="table table-striped fixedheader">
+<table class="table table-striped fixedheader table-responsive-sm">
 	<thead>
 		<tr>
 			<th scope="col">Date</th>
@@ -14,7 +14,7 @@
 			<th scope="col" class="d-none d-lg-table-cell">Distance</th>
 			<th scope="col" class="d-none d-lg-table-cell">Remarks</th>
 			<th scope="col" class="d-none d-lg-table-cell">My&nbsp;Callsign</th>
-			<th scope="col">Actions</th>
+			<!--<th scope="col">Actions</th>-->
 		</tr>
 	</thead>
 	<tbody>
@@ -22,15 +22,15 @@
 	<tr>
 		<td>{{ qso.date.strftime("%d.%m.%y") }}</td>
 		<td>{{ qso.time.strftime("%H:%M") }}</td>
-		<td>{{ flag(qso.callsign) }}<a href="{{ url_for('qso_show', qso_id=qso.id) }}">{{ qso.callsign }}</a></td>
+		<td class="nowrap">{{ flag(qso.callsign) }}<a href="{{ url_for('qso_show', qso_id=qso.id) }}">{{ qso.callsign }}</a></td>
 		<td>{{ qso.band }}</td>
 		<td><span class="badge badge-dark modebadge mode-{{ qso.mode|lower }}">{{ qso.mode }}</span></td>
-		<td>{{ flag(qso.my_sota_ref, True) if qso.my_sota_ref }}{{ summit_link(my_summit) }}</td>
-		<td>{{ flag(qso.sota_ref, True) if qso.sota_ref }}{{ summit_link(summit) }}</td>
+		<td class="nowrap">{{ flag(qso.my_sota_ref, True) if qso.my_sota_ref }}{{ summit_link(my_summit) }}</td>
+		<td class="nowrap">{{ flag(qso.sota_ref, True) if qso.sota_ref }}{{ summit_link(summit) }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.remarks if qso.remarks }}</td>
 		<td class="d-none d-lg-table-cell">{{ qso.my_callsign }}</td>
-		<td>TODO</td>
+		<!--<td>TODO</td>-->
 	</tr>
 	{%- endfor %}
 	</tbody>
