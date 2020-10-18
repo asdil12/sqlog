@@ -12,10 +12,10 @@ from sqlog.callsign import Callsign
 fields = ('id', 'datetime', 'my_callsign', 'callsign', 'name', 'freq', 'band', 'mode', 'rst_rcvd', 'rst_sent', 'qsl', 'my_qth', 'my_sota_ref', 'my_gridsquare', 'my_lat', 'my_lon', 'my_geoaccuracy', 'qth', 'sota_ref', 'gridsquare', 'lat', 'lon', 'geoaccuracy', 'distance', 'remarks')
 
 class GeoAccuracy(IntEnum):
-	USER = 10
-	SOTA = 20
-	GRID = 50
-	CALL = 40
+	CALL = 10
+	GRID = 20
+	SOTA = 30
+	USER = 40
 
 class QSO(object):
 	def __init__(self, data={}, **kwdata):
@@ -113,7 +113,7 @@ class QSO(object):
 
 		# Set distance based on coordinates if geoaccuracy is sufficient
 		if self.my_geoaccuracy >= GeoAccuracy.GRID and self.geoaccuracy >= GeoAccuracy.GRID:
-			if self.my_pos and pos:
+			if self.my_pos and self.pos:
 				if not isinstance(self.distance, float):
 					self.distance = sqlog.geo.distance(self.my_lat, self.my_lon, self.lat, self.lon)
 
