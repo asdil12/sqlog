@@ -5,6 +5,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/' + '..'))
 
 from flask import Flask, Markup, Response, render_template, request
+from flask_httpauth import HTTPBasicAuth
 import pymysql
 import json
 from io import TextIOWrapper
@@ -19,6 +20,11 @@ from sqlog.callsign import Callsign
 sqlog.Config.load(os.environ.get('CONFIG', 'config.cfg'))
 
 app = Flask(__name__)
+auth = HTTPBasicAuth(realm='SQLog')
+
+@auth.verify_password
+def check_user_password(user, password):
+	return sqlog.Config.get('web', 'user') and password == sqlog.Config.get('web', 'pass')
 
 @app.context_processor
 def utility_processor():
@@ -60,6 +66,7 @@ def sse(items):
 
 
 @app.route('/')
+@auth.login_required
 def logbook():
 	connection = sqlog.mysql_connection()
 	try:
@@ -91,6 +98,7 @@ def logbook():
 		connection.close()
 
 @app.route('/sota/summits')
+@auth.login_required
 def summits():
 	connection = sqlog.mysql_connection()
 	try:
@@ -107,6 +115,7 @@ def summits():
 		connection.close()
 
 @app.route('/qso/<int:qso_id>')
+@auth.login_required
 def qso_show(qso_id):
 	connection = sqlog.mysql_connection()
 	try:
@@ -121,6 +130,7 @@ def qso_show(qso_id):
 
 
 @app.route('/qso/import', methods=['GET', 'POST'])
+@auth.login_required
 def qso_import():
 	if request.method == 'POST':
 		logfile = request.files["logfile"]
@@ -132,6 +142,7 @@ def qso_import():
 	return render_template('qso_import.html', imported_qsos=imported_qsos)
 
 @app.route('/sota/refresh')
+@auth.login_required
 def sota_refresh():
 	if request.args.get('refresh') == '1':
 		return sse(sqlog.sota.update_db())
@@ -139,6 +150,7 @@ def sota_refresh():
 		return render_template('sota_refresh.html')
 
 @app.route('/map')
+@auth.login_required
 def qso_map():
 	return render_template('map.html')
 
