@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container d-flex flex-wrap cardsmargin">
-	<div class="card flex-grow-1">
+<div class="container d-flex flex-wrap cardsmargin"><div class="row">
+	<div class="card md-8">
 		<table class="table table-sm">
 			<tr>
 				<th>Date</th>
@@ -21,7 +21,7 @@
 				<td>{{ qso.band }}</td>
 				<td>{{ hide_decimal(qso.freq)|string + ' MHz' if 'qso.freq' else 'n/a' }}</td>
 				<td><span class="badge badge-dark modebadge mode-{{ qso.mode|lower }}">{{ qso.mode }}</span></td>
-				<td><span title="Sent">{% if not (qso.rst_sent or qso.rst_rcvd) %}n/a{% else %}{{ qso.rst_sent or '?' }}</span> / <span title="Received">{{ qso.rst_rcvd or '?' }}</span>{% endif %}</td>
+				<td>{% if not (qso.rst_sent or qso.rst_rcvd) %}n/a{% else %}<span title="Received">{{ qso.rst_rcvd or '?' }}</span> / <span title="Sent">{{ qso.rst_sent or '?' }}</span>{% endif %}</td>
 				<td class="d-none d-lg-table-cell">{{ qso.distance|int|string + 'km' if qso.distance else 'n/a' }}</td>
 			</tr>
 		</table>
@@ -120,7 +120,7 @@
 			</tr>
 		</table>
 	</div>
-	<div class="card" id="map" style="width: 350px; height: 300px;"></div>
+	<div class="card md-4" id="map" style="width: 350px; height: 300px;"></div>
 	<script type="text/javascript">
 		var mymap = L.map('map').setView([51.505, -0.09], 13);
 
@@ -162,5 +162,5 @@
 			mymap.setView(my_pos, 5);
 		}
 	</script>
-</div>
+</div></div>
 {% endblock %}
