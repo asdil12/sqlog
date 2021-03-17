@@ -105,6 +105,7 @@ def summits():
 		with connection.cursor() as cursor:
 			cursor.execute("""SELECT COUNT(id) AS qsos, MAX(datetime) as last_activation, summits.ref, summits.name, region, association, altitude, summits.lat, summits.lon
 			                  FROM qsos LEFT JOIN summits ON qsos.my_sota_ref = summits.ref
+			                  WHERE ref IS NOT NULL
 			                  GROUP BY my_sota_ref ORDER BY last_activation""")
 			def summititem(e):
 				summit = Summit.from_joined_db(e, '')
