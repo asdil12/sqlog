@@ -126,6 +126,8 @@ def qso_show(qso_id):
 			my_summit = Summit(qso.my_sota_ref) if qso.my_sota_ref else None
 			summit = Summit(qso.sota_ref) if qso.sota_ref else None
 			return render_template('qso.html', qso=qso, my_summit=my_summit, summit=summit)
+	except AttributeError:
+		return "QSO not found", 404
 	finally:
 		connection.close()
 
