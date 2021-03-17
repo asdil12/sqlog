@@ -26,7 +26,7 @@ def import_qsos(qsos):
 
 
 def read_adi(filename):
-	with open(filename, 'r', encoding="ascii") as f:
+	with open(filename, 'r', encoding="UTF-8") as f:
 		yield from read_adi_fp(f)
 
 def read_adi_fp(f):
@@ -34,7 +34,7 @@ def read_adi_fp(f):
 		yield sqlog.qso.QSO.from_adi(qso)
 
 def read_csv(filename):
-	with open(filename, 'r', encoding="ascii") as f:
+	with open(filename, 'r', encoding="UTF-8") as f:
 		yield from read_csv_fp(f)
 
 def read_csv_fp(f):
