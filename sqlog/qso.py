@@ -146,11 +146,11 @@ class QSO(object):
 
 	@property
 	def my_pos(self):
-		return (self.my_lat, self.my_lat) if (isinstance(self.my_lat, float) and isinstance(self.my_lon, float)) else None
+		return (self.my_lat, self.my_lon) if (isinstance(self.my_lat, float) and isinstance(self.my_lon, float)) else None
 
 	@property
 	def pos(self):
-		return (self.lat, self.lat) if (isinstance(self.lat, float) and isinstance(self.lon, float)) else None
+		return (self.lat, self.lon) if (isinstance(self.lat, float) and isinstance(self.lon, float)) else None
 
 	def __repr__(self):
 		return 'QSO(%s)' % ', '.join(['%s=%s' % (ks, getattr(self, k)) for k, ks in (('datetime', 'dt'), ('callsign', 'call'), ('my_sota_ref', 'sota')) if getattr(self, k)])
@@ -182,7 +182,7 @@ class QSO(object):
 			d['my_gridsquare'] = adi['my_gridsquare']
 		if 'my_lat' in adi and 'my_lon' in adi:
 			d['my_lat'] = float(adi['my_lat'])
-			d['my_lon'] = float(adi['my_lat'])
+			d['my_lon'] = float(adi['my_lon'])
 		if 'qth' in adi:
 			d['qth'] = adi['qth']
 		if 'sota_ref' in adi:
@@ -191,7 +191,7 @@ class QSO(object):
 			d['gridsquare'] = adi['gridsquare']
 		if 'lat' in adi and 'lon' in adi:
 			d['lat'] = float(adi['lat'])
-			d['lon'] = float(adi['lat'])
+			d['lon'] = float(adi['lon'])
 		if 'comment' in adi:
 			d['remarks'] = adi['comment']
 		return cls(d)
