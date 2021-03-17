@@ -22,7 +22,7 @@ def update_db(download=True):
 			file_last_updated = datetime.datetime.fromtimestamp(os.path.getmtime(SUMMIT_DB_FILE))
 		except FileNotFoundError:
 			file_last_updated = datetime.datetime.fromtimestamp(0)
-		if parsedate(r.headers['last-modified']) > file_last_updated.replace(tzinfo=datetime.timezone.utc):
+		if 'last-modified' not in r.headers or parsedate(r.headers['last-modified']) > file_last_updated.replace(tzinfo=datetime.timezone.utc):
 			r = requests.get(url, allow_redirects=True, stream=True)
 			with open(SUMMIT_DB_FILE, 'wb') as f:
 				yield 'Downloading summits '
